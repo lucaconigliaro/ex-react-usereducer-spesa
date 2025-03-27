@@ -14,11 +14,30 @@ function App() {
     setAddedProducts((prevAddedProducts) => {
       const productExists = prevAddedProducts.some((p) => p.name === product.name);
       if (productExists) {
-        return prevAddedProducts;
+        return updateProductQuantity(prevAddedProducts, product);
       }
       return [...prevAddedProducts, { ...product, quantity: 1 }];
     });
-  };
+  }
+
+  function updateProductQuantity(prevAddedProducts, product) {
+    return prevAddedProducts.map((p) => {
+      if (p.name === product.name) {
+        return { ...p, quantity: p.quantity + 1 };
+      }
+      return p;
+    });
+  }
+
+  function removeFromCart(index) {
+    setAddedProducts((prevAddedProducts) => {
+      return prevAddedProducts.filter((_, i) => i !== index);
+    });
+  }
+
+  const total = addedProducts.reduce((sum, product) => {
+    return sum + product.price * product.quantity;
+  }, 0);
 
   return (
     <div>
@@ -40,9 +59,11 @@ function App() {
                 <p>Nome: {product.name}</p>
                 <p>Prezzo: {product.price}</p>
                 <p>Quantità: {product.quantity}</p>
+                <button onClick={() => removeFromCart(index)}>Rimuovi dal carrello</button>
               </li>
             ))}
           </ul>
+          <h3>Totale: €{total.toFixed(2)}</h3>
         </div>
       )}
     </div>
