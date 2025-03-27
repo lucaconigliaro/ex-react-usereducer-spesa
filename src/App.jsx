@@ -10,34 +10,29 @@ function App() {
 
   const [addedProducts, setAddedProducts] = useState([]);
 
+  function updateProductQuantity(name, quantity) {
+    setAddedProducts(curr =>
+      curr.map(p => p.name === name ? { ...p, quantity } : p)
+    );
+  }
+
   function addToCart(product) {
-    setAddedProducts((prevAddedProducts) => {
-      const productExists = prevAddedProducts.some((p) => p.name === product.name);
-      if (productExists) {
-        return updateProductQuantity(prevAddedProducts, product);
-      }
-      return [...prevAddedProducts, { ...product, quantity: 1 }];
-    });
+    const addedProduct = addedProducts.find(p => p.name === product.name);
+    if (addedProduct) {
+      updateProductQuantity(addedProduct.name, addedProduct.quantity + 1)
+      return;
+    }
+    setAddedProducts(curr => [...curr, {
+      ...product,
+      quantity: 1
+    }]);
   }
 
-  function updateProductQuantity(prevAddedProducts, product) {
-    return prevAddedProducts.map((p) => {
-      if (p.name === product.name) {
-        return { ...p, quantity: p.quantity + 1 };
-      }
-      return p;
-    });
+  function removeFromCart(product) {
+    setAddedProducts(curr => curr.filter(p => p.name !== product.name));
   }
 
-  function removeFromCart(index) {
-    setAddedProducts((prevAddedProducts) => {
-      return prevAddedProducts.filter((_, i) => i !== index);
-    });
-  }
-
-  const total = addedProducts.reduce((sum, product) => {
-    return sum + product.price * product.quantity;
-  }, 0);
+  const total = addedProducts.reduce((sum, product) => sum + (product.price * product.quantity), 0);
 
   return (
     <div>
@@ -45,7 +40,7 @@ function App() {
       {products.map((product, index) => (
         <div key={index}>
           <p>Nome: {product.name}</p>
-          <p>Prezzo: {product.price}</p>
+          <p>Prezzo: {product.price.toFixed(2)}€</p>
           <button onClick={() => addToCart(product)}>Aggiungi al carrello</button>
         </div>
       ))}
@@ -57,9 +52,9 @@ function App() {
             {addedProducts.map((product, index) => (
               <li key={index}>
                 <p>Nome: {product.name}</p>
-                <p>Prezzo: {product.price}</p>
+                <p>Prezzo: {product.price.toFixed(2)}€</p>
                 <p>Quantità: {product.quantity}</p>
-                <button onClick={() => removeFromCart(index)}>Rimuovi dal carrello</button>
+                <button onClick={() => removeFromCart(product)}>Rimuovi dal carrello</button>
               </li>
             ))}
           </ul>
